@@ -84,6 +84,17 @@
         };
     };
 
+// Physical key-position reference (used by combo key-positions below):
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+//   │    0    │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │   10    │   11    │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │   12    │   13    │   14    │   15    │   16    │   17    │                     │   18    │   19    │   20    │   21    │   22    │   23    │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │   24    │   25    │   26    │   27    │   28    │   29    │                     │   30    │   31    │   32    │   33    │   34    │   35    │
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
+//                                           │   36    │  37     │  38      ││  39     │  40     │  41     │
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
+
     combos {
         compatible = "zmk,combos";
 
@@ -240,6 +251,16 @@
         };
     };
 
+// Physical key-position reference (used by combo key-positions below):
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+//   │    0    │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │   10    │   11    │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │   12    │   13    │   14    │   15    │   16    │   17    │                     │   18    │   19    │   20    │   21    │   22    │   23    │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │   24    │   25    │   26    │   27    │   28    │   29    │                     │   30    │   31    │   32    │   33    │   34    │   35    │
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
+//                                           │   36    │  37     │  38      ││  39     │  40     │  41     │
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
     macros {
         shifted: macro_shifted_kp {
             #binding-cells = <1>;
@@ -308,19 +329,26 @@
         base_layer {
             display-name = "Base";
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
-//   │  none   │    Q    │    W    │    E    │    R    │    T    │                     │    Y    │    U    │    I    │    O    │    P    │  none   │
+//   │ L-CLICK │    Q    │    W    │    E    │    R    │    T    │                     │    Y    │    U    │    I    │    O    │    P    │ R-CLICK │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  none   │    A    │    S    │    D    │    F    │    G    │                     │    H    │    J    │    K    │    L    │    ;    │  none   │
+//   │ESC/LT3  │    A    │    S    │    D    │    F    │    G    │                     │    H    │    J    │    K    │    L    │    ;    │  LALT   │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │ESC/LT 3 │    Z    │    X    │    C    │    V    │    B    │                     │    N    │    M    │    ,    │    .    │    /    │  SHIFT  │
+//   │  SHIFT  │    Z    │    X    │    C    │    V    │    B    │                     │    N    │    M    │    ,    │    .    │    /    │  SHIFT  │
 //   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │SPC/LT 3 │BSPC/LT 1│ DEL/LT 2 ││  RT/LT 2│SPC/SHFT │ESC/LT 4 │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
+// L-CLICK/R-CLICK (&mkp LCLK/RCLK) and LALT live on the base layer and pass
+// through via &trans on every other layer, so they're reachable regardless
+// of which layer is active. &mkp holds for exactly as long as the physical
+// key is held (good for trackball drag-to-select); release is tied to the
+// key position rather than the active layer, so you can hold L-CLICK, let
+// go of a layer-hold thumb key while still holding L-CLICK, and separately
+// hold LALT with another finger for option-drag selection in terminals.
             bindings = <
-&none      &as Q      &as W    &as E      &as R      &as T          &as Y      &as U          &as I        &as O     &as P          &none
-&none      &as A      &as S    &as D      &as F      &as G          &as H      &as J          &as K        &as L     &as SEMICOLON  &none
-&as ESC    &as Z      &as X    &as C      &as V      &as B          &as N      &as M          &as COMMA    &as DOT   &as SLASH      &kp RSHFT
-                            &lt 3 SPACE &lt 1 BSPC &lt 2 DEL      &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
+&mkp LCLK  &as Q      &as W    &as E      &as R      &as T          &as Y      &as U          &as I        &as O     &as P          &mkp RCLK
+&as ESC    &as A      &as S    &as D      &as F      &as G          &as H      &as J          &as K        &as L     &as SEMICOLON  &kp LALT
+&kp LSHFT  &as Z      &as X    &as C      &as V      &as B          &as N      &as M          &as COMMA    &as DOT   &as SLASH      &kp RSHFT
+                            &lt 3 SPACE &lt 1 BSPC &lt 2 DEL        &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
             >;
         };
 
@@ -329,16 +357,16 @@
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │    0    │  trans  │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  trans  │    ~    │    -    │    =    │    \    │    '    │                     │   LEFT  │   DOWN  │   UP    │  RIGHT  │  PG_UP  │  trans  │
+//   │  TAB    │    ~    │    -    │    =    │    \    │    '    │                     │   LEFT  │   DOWN  │   UP    │  RIGHT  │  PG_UP  │  trans  │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │   TAB   │    [    │    ]    │    {    │    }    │  ENTER  │                     │  HOME   │  PG_DN  │  PG_UP  │   END   │  PG_DN  │  trans  │
+//   │ trans   │    [    │    ]    │    {    │    }    │  ENTER  │                     │  HOME   │  PG_DN  │  PG_UP  │   END   │  PG_DN  │  trans  │
 //   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &trans   &as N1     &as N2     &as N3     &as N4      &as N5         &as N6      &as N7      &as N8      &as N9      &as N0    &trans
-&trans   &as GRAVE  &as MINUS  &as EQUAL  &as BSLH    &as SQT        &kp LEFT    &kp DOWN    &kp UP      &kp RIGHT   &kp PG_UP &trans
-&kp TAB  &kp LBKT   &kp RBKT   &kp LBRC   &kp RBRC    &kp RET        &kp HOME    &kp PG_DN   &kp PG_UP   &kp END     &kp PG_DN &trans
+&kp TAB  &as GRAVE  &as MINUS  &as EQUAL  &as BSLH    &as SQT        &kp LEFT    &kp DOWN    &kp UP      &kp RIGHT   &kp PG_UP &trans
+&trans   &kp LBKT   &kp RBKT   &kp LBRC   &kp RBRC    &kp RET        &kp HOME    &kp PG_DN   &kp PG_UP   &kp END     &kp PG_DN &trans
                                 &trans     &trans      &trans         &trans      &trans      &trans
             >;
         };
@@ -356,10 +384,10 @@
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
-&trans   &sys_reset        &bt BT_CLR  &out OUT_TOG            &kp LG(LA(UP_ARROW))     &bt BT_SEL 0         &kp INSERT       &kp F7  &kp F8  &kp F9  &kp F12  &trans
-&trans   &bootloader       &bt BT_NXT  &kp LG(LA(LEFT_ARROW))  &kp LG(LA(RIGHT_ARROW))  &bt BT_SEL 1         &kp SLCK         &kp F4  &kp F5  &kp F6  &kp F11  &trans
-&trans   &region_capture2  &bt BT_PRV  &studio_unlock          &kp LG(LA(DOWN_ARROW))   &bt BT_SEL 2         &kp PAUSE_BREAK  &kp F1  &kp F2  &kp F3  &kp F10  &trans
-                                       &trans                  &trans                   &trans               &trans           &trans  &trans
+&trans   &sys_reset        &bt BT_CLR  &out OUT_TOG            &kp LG(LA(UP_ARROW))     &bt BT_SEL 0                          &kp INSERT       &kp F7  &kp F8  &kp F9  &kp F12  &trans
+&trans   &bootloader       &bt BT_NXT  &kp LG(LA(LEFT_ARROW))  &kp LG(LA(RIGHT_ARROW))  &bt BT_SEL 1                          &kp SLCK         &kp F4  &kp F5  &kp F6  &kp F11  &trans
+&trans   &region_capture2  &bt BT_PRV  &studio_unlock          &kp LG(LA(DOWN_ARROW))   &bt BT_SEL 2                          &kp PAUSE_BREAK  &kp F1  &kp F2  &kp F3  &kp F10  &trans
+                                       &trans                  &trans                   &trans                                &trans           &trans  &trans
             >;
         };
 
