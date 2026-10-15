@@ -249,7 +249,7 @@ static const struct zmk_input_processor_driver_api zip_ps_driver_api = {
         .pipelines = zip_ps_pipelines_##n,                                                         \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, &zip_ps_init, NULL, &zip_ps_data_##n, &zip_ps_config_##n,             \
-                          POST_KERNEL, 95, &zip_ps_driver_api);
+                          POST_KERNEL, 20, &zip_ps_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ZIP_PS_INST)
 
