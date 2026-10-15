@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2026 Vincent Franco
+/* Copyright (c) 2026 Vincent Franco
  * SPDX-License-Identifier: MIT
  *
  * Routes input events through one of several child pipelines of input
