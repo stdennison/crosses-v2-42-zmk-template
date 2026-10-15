@@ -73,6 +73,18 @@
             bindings = <&to>, <&sl>;
         };
 
+        // Same timing as ZMK's built-in &lt, but the hold side also flips the
+        // LEFT trackball into Scroll mode (see mo_scrl below).
+        lt3s: layer3_scroll_tap {
+            compatible = "zmk,behavior-hold-tap";
+            label = "LAYER3_SCROLL_TAP";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <175>;
+            bindings = <&mo_scrl>, <&kp>;
+        };
+
         ts: temp_sticky {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -101,32 +113,32 @@
         combo_esc {
             timeout-ms = <50>;
             key-positions = <1 2>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             bindings = <&kp ESC>;
         };
 
         combo_tab {
             timeout-ms = <50>;
             key-positions = <1 2 37 40>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             bindings = <&kp TAB>;
         };
         combo_tab2 {
             timeout-ms = <50>;
             key-positions = <24 35>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             bindings = <&kp TAB>;
         };
         combo_caps_word {
             timeout-ms = <50>;
             key-positions = <29 30>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             bindings = <&caps_word>;
         };
         combo_undo {
             timeout-ms = <50>;
             key-positions = <38 39>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             bindings = <&kp LC(Z)>;
         };
 
@@ -161,27 +173,27 @@
         combo_super1 {
             timeout-ms = <50>;
             key-positions = <16 15>;
-            layers = <0 2 3 1>;
+            layers = <0 3 1>;
             bindings = <&kp LGUI>;
         };
         combo_super2 {
             timeout-ms = <50>;
             key-positions = <19 20>;
-            layers = <0 2 3 1>;
+            layers = <0 3 1>;
             bindings = <&kp LGUI>;
         };
 
         to_game_layer {
             bindings = <&to GAME>;
             key-positions = <5 6>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             timeout-ms = <50>;
         };
 
         region_screen {
             bindings = <&capture_region>;
             key-positions = <6 7>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
             timeout-ms = <50>;
         };
 
@@ -189,64 +201,67 @@
             bindings = <&kp BACKSPACE>;
             key-positions = <4 5>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_lbrace {
             bindings = <&kp LS(LBKT)>;
             key-positions = <28 29>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_rbrace {
             bindings = <&kp LS(RBKT)>;
             key-positions = <30 31>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_lparen {
             bindings = <&kp LS(N9)>;
             key-positions = <5 17>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_rparen {
             bindings = <&kp LS(N0)>;
             key-positions = <6 18>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_lbracket {
             bindings = <&kp LBKT>;
             key-positions = <4 16>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_rbracket {
             bindings = <&kp RBKT>;
             key-positions = <7 19>;
             timeout-ms = <50>;
-            layers = <0 1 2 3>;
+            layers = <0 1 3>;
         };
 
         combo_copy {
             timeout-ms = <50>;
             key-positions = <26 27>;
+            layers = <0 1 3 4 5>;
             bindings = <&kp LG(C)>;
         };
         combo_cut {
             timeout-ms = <50>;
             key-positions = <25 26>;
+            layers = <0 1 3 4 5>;
             bindings = <&kp LG(X)>;
         };
         combo_paste {
             timeout-ms = <50>;
             key-positions = <27 28>;
+            layers = <0 1 3 4 5>;
             bindings = <&kp LG(V)>;
         };
     };
@@ -295,6 +310,29 @@
                 <&macro_param_1to2>,
                 <&as_ht MACRO_PLACEHOLDER MACRO_PLACEHOLDER>;
         };
+        // Hold: activate layer <param> AND switch the left ball (zip_periph_ball)
+        // to pipeline 1 (scroll; persist=0 so nothing is written to flash).
+        // Release: drop the layer and return the ball to pipeline 0 (cursor).
+        mo_scrl: momentary_scroll {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            label = "MOMENTARY_SCROLL";
+            wait-ms = <10>;
+            tap-ms = <10>;
+            bindings =
+                <&macro_press>,
+                <&macro_param_1to1>,
+                <&mo MACRO_PLACEHOLDER>,
+                <&macro_tap>,
+                <&pipe_switch 1 0>,
+                <&macro_pause_for_release>,
+                <&macro_release>,
+                <&macro_param_1to1>,
+                <&mo MACRO_PLACEHOLDER>,
+                <&macro_tap>,
+                <&pipe_switch 0 0>;
+        };
+
         capture_region: capture_region {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -348,7 +386,7 @@
 &mkp LCLK  &as Q      &as W    &as E      &as R      &as T          &as Y      &as U          &as I        &as O     &as P          &mkp RCLK
 &as ESC    &as A      &as S    &as D      &as F      &as G          &as H      &as J          &as K        &as L     &as SEMICOLON  &kp LALT
 &kp LSHFT  &as Z      &as X    &as C      &as V      &as B          &as N      &as M          &as COMMA    &as DOT   &as SLASH      &kp RSHFT
-                            &lt 3 SPACE &lt 1 BSPC &lt 2 DEL        &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
+                            &lt3s 3 SPACE &lt 1 BSPC &lt 2 DEL        &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
             >;
         };
 
@@ -374,19 +412,20 @@
         media_layer {
             display-name = "Media";
 //   (formerly FUNCTION layer content, ported from corne4-sys.vil layer 4 position — moved here per request)
+//   Combos are disabled on this layer. L-CLICK 5/6, R-CLICK 17/18, LALT 4/7. F-key block shifted right one column.
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
-//   │  trans  │  RESET  │  BT CLR │ OUT TOG │  WIN ^  │ BTSEL 0 │                     │   INS   │    F7   │    F8   │    F9   │   F12   │  trans  │
+//   │  RESET  │ BTSEL 0 │ BTSEL 1 │ BTSEL 2 │   LALT  │ L-CLICK │                     │ L-CLICK │   LALT  │    F7   │    F8   │    F9   │   F12   │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  trans  │  BOOTLD │ BT NEXT │  WIN <  │  WIN >  │ BTSEL 1 │                     │  SLCK   │    F4   │    F5   │    F6   │   F11   │  trans  │
+//   │  BOOTLD │ BT PREV │ BT NEXT │  WIN <  │  WIN >  │ R-CLICK │                     │ R-CLICK │   SLCK  │    F4   │    F5   │    F6   │   F11   │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  trans  │ CAPTURE │ BT PREV │ STUDIO  │  WIN v  │ BTSEL 2 │                     │  PAUSE  │    F1   │    F2   │    F3   │   F10   │  trans  │
+//   │  BT CLR │  WIN ^  │  WIN v  │ CAPTURE │ OUT TOG │  STUDIO │                     │  INSERT │  PAUSE  │    F1   │    F2   │    F3   │   F10   │
 //   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
-&trans   &sys_reset        &bt BT_CLR  &out OUT_TOG            &kp LG(LA(UP_ARROW))     &bt BT_SEL 0                          &kp INSERT       &kp F7  &kp F8  &kp F9  &kp F12  &trans
-&trans   &bootloader       &bt BT_NXT  &kp LG(LA(LEFT_ARROW))  &kp LG(LA(RIGHT_ARROW))  &bt BT_SEL 1                          &kp SLCK         &kp F4  &kp F5  &kp F6  &kp F11  &trans
-&trans   &region_capture2  &bt BT_PRV  &studio_unlock          &kp LG(LA(DOWN_ARROW))   &bt BT_SEL 2                          &kp PAUSE_BREAK  &kp F1  &kp F2  &kp F3  &kp F10  &trans
+&sys_reset  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2          &kp LALT                 &mkp LCLK              &mkp LCLK       &kp LALT  &kp F7  &kp F8  &kp F9  &kp F12
+&bootloader &bt BT_PRV    &bt BT_NXT    &kp LG(LA(LEFT_ARROW)) &kp LG(LA(RIGHT_ARROW)) &mkp RCLK              &mkp RCLK       &kp SLCK  &kp F4  &kp F5  &kp F6  &kp F11
+&bt BT_CLR  &kp LG(LA(UP_ARROW)) &kp LG(LA(DOWN_ARROW)) &region_capture2 &out OUT_TOG  &studio_unlock         &kp INSERT      &kp PAUSE_BREAK &kp F1 &kp F2 &kp F3 &kp F10
                                        &trans                  &trans                   &trans                                &trans           &trans  &trans
             >;
         };
@@ -394,6 +433,7 @@
         function_layer {
             display-name = "Function";
 //   (ported from corne4-sys.vil layer 4: mission-control space switching + media transport + mac shortcuts)
+//   While this layer is held via the left thumb (&lt3s 3 SPACE), the LEFT trackball scrolls (pipe_switch 1) instead of moving the cursor.
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │ ⌥⌘ SPC1 │ ⌥⌘ SPC2 │ ⌥⌘ SPC3 │ ⌥⌘ SPC4 │ ⌥⌘ SPC5 │                     │ ⌥⌘ SPC6 │ ⌥⌘ SPC7 │ ⌥⌘ SPC8 │ ⌥⌘ SPC9 │ ⌥⌘ SPC0 │  trans  │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
