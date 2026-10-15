@@ -8,10 +8,8 @@ manifest:
     - name: crosses-v2-zmk-firmware
       remote: Good-Great-Grand-Wonderful
       import: config/west.yml
-    # Local vendored override for the pipeline-switch module.
-    # Path is relative to this file (config/west.yml), so ../modules/...
+    # Use the remote copy of the pipeline-switch module instead of a vendored path
     - name: zmk-input-processor-pipeline-switch
       remote: Good-Great-Grand-Wonderful
-      path: ../modules/zmk-input-processor-pipeline-switch
   self:
     path: config
