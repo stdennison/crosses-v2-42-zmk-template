@@ -2,7 +2,7 @@ name: Build ZMK firmware
 on: [push, pull_request, workflow_dispatch]
 
 jobs: 
-debug-west-manifest: 
+  debug-west-manifest: 
 runs-on: ubuntu-latest 
 steps: 
 - uses: actions/checkout@v4
@@ -32,3 +32,4 @@ steps:
   build: 
   needs: debug-west-manifest
   uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+
