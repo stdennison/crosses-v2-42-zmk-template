@@ -29,5 +29,6 @@ steps:
       git grep -n "zmk-input-processor-pipeline-switch" || true
       git grep -n "../modules/zmk-input-processor-pipeline-switch" || true
 
-jobs:
-  build: needs: debug-west-manifest uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+  build: 
+  needs: debug-west-manifest
+  uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
