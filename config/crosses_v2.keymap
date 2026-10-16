@@ -14,6 +14,7 @@
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 20    // default: 10
 
 #include <dt-bindings/zmk/pointing.h>
+#include <dt-bindings/zmk/input_transform.h>
 
 #define BASE      0
 #define NUM       1
@@ -73,18 +74,6 @@
             bindings = <&to>, <&sl>;
         };
 
-        // Same timing as ZMK's built-in &lt, but the hold side also flips the
-        // LEFT trackball into Scroll mode (see mo_scrl below).
-        lt3s: layer3_scroll_tap {
-            compatible = "zmk,behavior-hold-tap";
-            label = "LAYER3_SCROLL_TAP";
-            #binding-cells = <2>;
-            flavor = "tap-preferred";
-            tapping-term-ms = <200>;
-            quick-tap-ms = <175>;
-            bindings = <&mo_scrl>, <&kp>;
-        };
-
         ts: temp_sticky {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -97,15 +86,15 @@
     };
 
 // Physical key-position reference (used by combo key-positions below):
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │    0    │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │   10    │   11    │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │   12    │   13    │   14    │   15    │   16    │   17    │                     │   18    │   19    │   20    │   21    │   22    │   23    │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │   24    │   25    │   26    │   27    │   28    │   29    │                     │   30    │   31    │   32    │   33    │   34    │   35    │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │   36    │  37     │  38      ││  39     │  40     │  41     │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
 
     combos {
         compatible = "zmk,combos";
@@ -267,15 +256,15 @@
     };
 
 // Physical key-position reference (used by combo key-positions below):
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │    0    │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │   10    │   11    │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │   12    │   13    │   14    │   15    │   16    │   17    │                     │   18    │   19    │   20    │   21    │   22    │   23    │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │   24    │   25    │   26    │   27    │   28    │   29    │                     │   30    │   31    │   32    │   33    │   34    │   35    │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │   36    │  37     │  38      ││  39     │  40     │  41     │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
     macros {
         shifted: macro_shifted_kp {
             #binding-cells = <1>;
@@ -310,32 +299,6 @@
                 <&macro_param_1to2>,
                 <&as_ht MACRO_PLACEHOLDER MACRO_PLACEHOLDER>;
         };
-        // Hold: activate layer <param> AND switch the left ball (zip_periph_ball)
-        // to pipeline 1 (scroll; persist=0 so nothing is written to flash).
-        // Release: drop the layer and return the ball to pipeline 0 (cursor).
-        // NOTE: Removed direct &pipe_switch calls to avoid device init-order
-        // validation errors (momentary macro was initializing before the
-        // pipeline-switch behavior). If you need to flip the pipeline when
-        // holding this key, implement the pipe switch in a behavior that
-        // initializes earlier or trigger it from application logic instead.
-        mo_scrl: momentary_scroll {
-            compatible = "zmk,behavior-macro-one-param";
-            #binding-cells = <1>;
-            label = "MOMENTARY_SCROLL";
-            wait-ms = <10>;
-            tap-ms = <10>;
-            bindings =
-                <&macro_press>,
-                <&macro_param_1to1>,
-                <&mo MACRO_PLACEHOLDER>,
-                <&macro_tap>,
-                <&macro_pause_for_release>,
-                <&macro_release>,
-                <&macro_param_1to1>,
-                <&mo MACRO_PLACEHOLDER>,
-                <&macro_tap>;
-        };
-
         capture_region: capture_region {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -369,34 +332,41 @@
 
         base_layer {
             display-name = "Base";
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │ L-CLICK │    Q    │    W    │    E    │    R    │    T    │                     │    Y    │    U    │    I    │    O    │    P    │ R-CLICK │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │ESC/LT3  │    A    │    S    │    D    │    F    │    G    │                     │    H    │    J    │    K    │    L    │    ;    │  LALT   │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  SHIFT  │    Z    │    X    │    C    │    V    │    B    │                     │    N    │    M    │    ,    │    .    │    /    │  SHIFT  │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │SPC/LT 3 │BSPC/LT 1│ DEL/LT 2 ││  RT/LT 2│SPC/SHFT │ESC/LT 4 │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
+// L-CLICK/R-CLICK (&mkp LCLK/RCLK) and LALT live on the base layer and pass
+// through via &trans on every other layer, so they're reachable regardless
+// of which layer is active. &mkp holds for exactly as long as the physical
+// key is held (good for trackball drag-to-select); release is tied to the
+// key position rather than the active layer, so you can hold L-CLICK, let
+// go of a layer-hold thumb key while still holding L-CLICK, and separately
+// hold LALT with another finger for option-drag selection in terminals.
             bindings = <
 &mkp LCLK  &as Q      &as W    &as E      &as R      &as T          &as Y      &as U          &as I        &as O     &as P          &mkp RCLK
 &as ESC    &as A      &as S    &as D      &as F      &as G          &as H      &as J          &as K        &as L     &as SEMICOLON  &kp LALT
 &kp LSHFT  &as Z      &as X    &as C      &as V      &as B          &as N      &as M          &as COMMA    &as DOT   &as SLASH      &kp RSHFT
-                            &lt3s 3 SPACE &lt 1 BSPC &lt 2 DEL        &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
+                            &lt 3 SPACE &lt 1 BSPC &lt 2 DEL        &lt 2 RET  &mt LSHFT SPACE   &lt 4 ESC
             >;
         };
 
         num_layer {
             display-name = "Num";
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │    1    │    2    │    3    │    4    │    5    │                     │    6    │    7    │    8    │    9    │    0    │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  TAB    │    ~    │    -    │    =    │    \    │    '    │                     │   LEFT  │   DOWN  │   UP    │  RIGHT  │  PG_UP  │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │ trans   │    [    │    ]    │    {    │    }    │  ENTER  │                     │  HOME   │  PG_DN  │  PG_UP  │   END   │  PG_DN  │  trans  │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &trans   &as N1     &as N2     &as N3     &as N4      &as N5         &as N6      &as N7      &as N8      &as N9      &as N0    &trans
 &kp TAB  &as GRAVE  &as MINUS  &as EQUAL  &as BSLH    &as SQT        &kp LEFT    &kp DOWN    &kp UP      &kp RIGHT   &kp PG_UP &trans
@@ -409,15 +379,15 @@
             display-name = "Media";
 //   (formerly FUNCTION layer content, ported from corne4-sys.vil layer 4 position — moved here per request)
 //   Combos are disabled on this layer. L-CLICK 5/6, R-CLICK 17/18, LALT 4/7. F-key block shifted right one column.
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  RESET  │ BTSEL 0 │ BTSEL 1 │ BTSEL 2 │   LALT  │ L-CLICK │                     │ L-CLICK │   LALT  │    F7   │    F8   │    F9   │   F12   │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  BOOTLD │ BT PREV │ BT NEXT │  WIN <  │  WIN >  │ R-CLICK │                     │ R-CLICK │   SLCK  │    F4   │    F5   │    F6   │   F11   │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  BT CLR │  WIN ^  │  WIN v  │ CAPTURE │ OUT TOG │  STUDIO │                     │  INSERT │  PAUSE  │    F1   │    F2   │    F3   │   F10   │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &sys_reset  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2          &kp LALT                 &mkp LCLK              &mkp LCLK       &kp LALT  &kp F7  &kp F8  &kp F9  &kp F12
 &bootloader &bt BT_PRV    &bt BT_NXT    &kp LG(LA(LEFT_ARROW)) &kp LG(LA(RIGHT_ARROW)) &mkp RCLK              &mkp RCLK       &kp SLCK  &kp F4  &kp F5  &kp F6  &kp F11
@@ -429,16 +399,16 @@
         function_layer {
             display-name = "Function";
 //   (ported from corne4-sys.vil layer 4: mission-control space switching + media transport + mac shortcuts)
-//   While this layer is held via the left thumb (&lt3s 3 SPACE), the LEFT trackball scrolls (pipe_switch 1) instead of moving the cursor.
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
-//   │  trans  │ ⌥⌘ SPC1 │ ⌥⌘ SPC2 │ ⌥⌘ SPC3 │ ⌥⌘ SPC4 │ ⌥⌘ SPC5 │                     │ ⌥⌘ SPC6 │ ⌥⌘ SPC7 │ ⌥⌘ SPC8 │ ⌥⌘ SPC9 │ ⌥⌘[...]
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   While this layer is held (left thumb, &lt 3 SPACE) the LEFT trackball scrolls; see &trackball_peripheral_listener at the end of this file.
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+//   │  trans  │ ⌥⌘ SPC1 │ ⌥⌘ SPC2 │ ⌥⌘ SPC3 │ ⌥⌘ SPC4 │ ⌥⌘ SPC5 │                     │ ⌥⌘ SPC6 │ ⌥⌘ SPC7 │ ⌥⌘ SPC8 │ ⌥⌘ SPC9 │ ⌥⌘ SPC0 │  trans  │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  trans  │  MUTE   │  VOL -  │  VOL +  │  PLAY   │  NEXT   │                     │ ⌘  `    │ ⌃⌘  J   │ ⌃⌘  K   │ ⌃⌘  /   │ ⇧⌘  4   │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  trans  │         │         │         │         │         │                     │         │         │         │         │         │  trans  │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │⌃⌘ + SPC │  trans  │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &trans   &kp LG(LA(N1))  &kp LG(LA(N2))  &kp LG(LA(N3))  &kp LG(LA(N4))   &kp LG(LA(N5))       &kp LG(LA(N6))  &kp LG(LA(N7))  &kp LG(LA(N8))  &kp LG(LA(N9))   &kp LG(LA(N0))  &trans
 &trans   &kp C_MUTE      &kp C_VOL_DN    &kp C_VOL_UP    &kp C_PLAY_PAUSE &kp C_NEXT           &kp LG(GRAVE)   &kp LC(LG(J))   &kp LC(LG(K))   &kp LC(LG(FSLH)) &kp LS(LG(N4))  &trans
@@ -450,40 +420,61 @@
         numpad_layer {
             display-name = "Numpad";
 //   (ported from corne4-sys.vil layer 5)
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │  trans  │  trans  │  trans  │  trans  │  trans  │                     │  trans  │    7    │    8    │    9    │  trans  │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  trans  │    /    │    *    │    -    │    +    │    =    │                     │    0    │    4    │    5    │    6    │  trans  │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  trans  │  trans  │  trans  │  trans  │  trans  │  trans  │                     │  ENTER  │    1    │    2    │    3    │    .    │  trans  │
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &trans   &trans        &trans          &trans        &trans        &trans              &trans        &kp KP_N7  &kp KP_N8  &kp KP_N9  &trans  &trans
 &trans   &kp KP_SLASH  &kp KP_MULTIPLY &kp KP_MINUS  &kp KP_PLUS   &kp KP_EQUAL        &kp KP_N0     &kp KP_N4  &kp KP_N5  &kp KP_N6  &trans  &trans
 &trans   &trans        &trans          &trans        &trans        &trans              &kp KP_ENTER  &kp KP_N1  &kp KP_N2  &kp KP_N3  &kp KP_DOT  &trans
-                                        &trans        &trans        &trans              &trans         &trans     &trans
+                                       &trans        &trans        &trans              &trans         &trans     &trans
             >;
         };
 
         game_layer {
             display-name = "Game";
-//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐       [...]
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │    1    │    2    │    3    │    4    │    5    │                     │  trans  │  trans  │  trans  │  trans  │  trans  │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  trans  │  SHIFT  │    A    │    W    │    D    │    F    │                     │  trans  │  trans  │  trans  │  trans  │  trans  │  trans  │
-//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤       [...]
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
 //   │  none   │  CTRL   │  none   │    S    │    C    │  none   │                     │  trans  │  trans  │  trans  │  trans  │  trans  │  TO BASE│
-//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──�[...]
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │   ALT   │  SPACE  │  SPACE   ││  trans  │  trans  │  trans  │
-//                                           └─────────┴─────────┴──────────┘└─────────┴───────[...]
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
 &trans   &kp N1     &kp N2  &kp N3    &kp N4     &kp N5         &trans  &trans  &trans  &trans  &trans  &trans
 &trans   &kp LSHFT  &kp A   &kp W     &kp D      &kp F          &trans  &trans  &trans  &trans  &trans  &trans
 &none    &kp LCTRL  &none   &kp S     &kp C      &none          &trans  &trans  &trans  &trans  &trans  &to 0
-                            &kp LALT  &kp SPACE  &kp SPACE       &trans  &trans  &trans
+                           &kp LALT  &kp SPACE  &kp SPACE       &trans  &trans  &trans
             >;
         };
+    };
+};
+
+// ---- Left trackball: scroll while layer 3 (FUNCTION) is held ----
+// Events from the left (peripheral) ball arrive at the central (right half)
+// through trackball_peripheral_listener. The central knows the active layer,
+// so a per-layer child node here can change what happens to them. The ball
+// stays in its normal Cursor pipeline on every other layer.
+// X scrolls horizontally, Y vertically; diagonal movement does both.
+// Direction: no flip below = ball motion passed straight to the wheel.
+// If vertical feels backwards, add INPUT_TRANSFORM_Y_INVERT; if horizontal
+// does, add INPUT_TRANSFORM_X_INVERT (see the commented line).
+&trackball_peripheral_listener {
+    scroll_layer {
+        layers = <3>;
+        input-processors
+            // = <&zip_xy_transform (INPUT_TRANSFORM_Y_INVERT)>
+            = <&zip_xy_to_scroll_mapper>
+            , <&zip_scroll_scaler 1 8>
+            , <&zip_report_rate_limit 16>
+            ;
     };
 };
