@@ -1,0 +1,2 @@
+/* Placeholder overlay to avoid empty DT fragment during CI preprocessing.
+   This file intentionally contains no node definitions. */
