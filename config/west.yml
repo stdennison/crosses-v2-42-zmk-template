@@ -2,16 +2,17 @@ manifest:
   defaults:
     revision: main
   remotes:
-    - name: Good-Great-Grand-Wonderful
-      url-base: https://github.com/Good-Great-Grand-Wonderful
+    - name: stdennison
+      url-base: https://github.com/stdennison
   projects:
     - name: crosses-v2-zmk-firmware
-      remote: Good-Great-Grand-Wonderful
+      remote: stdennison
       import: config/west.yml
+      path: modules/crosses-v2-zmk-firmware
     # Local vendored override for the pipeline-switch module.
     # Path is relative to this file (config/west.yml), so ../modules/...
     - name: zmk-input-processor-pipeline-switch
-      remote: Good-Great-Grand-Wonderful
+      remote: stdennison
       path: modules/zmk-input-processor-pipeline-switch
   self:
     path: config
