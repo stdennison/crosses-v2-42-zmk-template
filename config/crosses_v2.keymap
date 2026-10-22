@@ -22,6 +22,7 @@
 #define FUNCTION  3
 #define NUMPAD    4
 #define GAME      5
+#define MAINT     6
 
 &mt {
     quick-tap-ms = <100>;
@@ -34,6 +35,16 @@
     chosen { zmk,physical-layout = &gggw_crosses_42_layout; };
 
     behaviors {
+        // Used only by the outer-thumb combos. Other key presses must not
+        // bypass the 500 ms guard; a short chord does nothing.
+        maint_gate: maintenance_hold {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <500>;
+            bindings = <&mo>, <&none>;
+        };
+
         hm: homerow_mods {
             compatible = "zmk,behavior-hold-tap";
             label = "HOMEROW_MODS";
@@ -98,6 +109,22 @@
 
     combos {
         compatible = "zmk,combos";
+
+        // Enter from Base only. Default combo release exits Maintenance as
+        // soon as either thumb is released (do not enable slow-release).
+        combo_maintenance_left {
+            timeout-ms = <50>;
+            key-positions = <36 38>;
+            layers = <BASE>;
+            bindings = <&maint_gate MAINT 0>;
+        };
+
+        combo_maintenance_right {
+            timeout-ms = <50>;
+            key-positions = <39 41>;
+            layers = <BASE>;
+            bindings = <&maint_gate MAINT 0>;
+        };
 
         combo_esc {
             timeout-ms = <50>;
@@ -342,8 +369,8 @@
 //                                           │SPC/LT 3 │BSPC/LT 1│ DEL/LT 2 ││  RT/LT 2│SPC/SHFT │ESC/LT 4 │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
 // L-CLICK/R-CLICK (&mkp LCLK/RCLK) and LALT live on the base layer and pass
-// through via &trans on every other layer, so they're reachable regardless
-// of which layer is active. &mkp holds for exactly as long as the physical
+// through via &trans on ordinary layers. Maintenance uses explicit commands
+// and blocks unused positions. &mkp holds for exactly as long as the physical
 // key is held (good for trackball drag-to-select); release is tied to the
 // key position rather than the active layer, so you can hold L-CLICK, let
 // go of a layer-hold thumb key while still holding L-CLICK, and separately
@@ -380,26 +407,26 @@
 //   (formerly FUNCTION layer content, ported from corne4-sys.vil layer 4 position — moved here per request)
 //   Combos are disabled on this layer. L-CLICK 5/6, R-CLICK 17/18, LALT 4/7. F-key block shifted right one column.
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
-//   │  RESET  │ BTSEL 0 │ BTSEL 1 │ BTSEL 2 │   LALT  │ L-CLICK │                     │ L-CLICK │   LALT  │    F7   │    F8   │    F9   │   F12   │
+//   │    —    │    —    │    —    │    —    │   LALT  │ L-CLICK │                     │ L-CLICK │   LALT  │    F7   │    F8   │    F9   │   F12   │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  BOOTLD │ BT PREV │ BT NEXT │  WIN <  │  WIN >  │ R-CLICK │                     │ R-CLICK │   SLCK  │    F4   │    F5   │    F6   │   F11   │
+//   │    —    │    —    │    —    │  WIN <  │  WIN >  │ R-CLICK │                     │ R-CLICK │   SLCK  │    F4   │    F5   │    F6   │   F11   │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-//   │  BT CLR │  WIN ^  │  WIN v  │ CAPTURE │ OUT TOG │  STUDIO │                     │  INSERT │  PAUSE  │    F1   │    F2   │    F3   │   F10   │
+//   │    —    │  WIN ^  │  WIN v  │ CAPTURE │    —    │    —    │                     │  INSERT │  PAUSE  │    F1   │    F2   │    F3   │   F10   │
 //   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
 //                                           │  trans  │  trans  │  trans   ││  trans  │  trans  │  trans  │
 //                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
             bindings = <
-&sys_reset  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2          &kp LALT                 &mkp LCLK              &mkp LCLK       &kp LALT  &kp F7  &kp F8  &kp F9  &kp F12
-&bootloader &bt BT_PRV    &bt BT_NXT    &kp LG(LA(LEFT_ARROW)) &kp LG(LA(RIGHT_ARROW)) &mkp RCLK              &mkp RCLK       &kp SLCK  &kp F4  &kp F5  &kp F6  &kp F11
-&bt BT_CLR  &kp LG(LA(UP_ARROW)) &kp LG(LA(DOWN_ARROW)) &region_capture2 &out OUT_TOG  &studio_unlock         &kp INSERT      &kp PAUSE_BREAK &kp F1 &kp F2 &kp F3 &kp F10
-                                       &trans                  &trans                   &trans                                &trans           &trans  &trans
+&none &none &none &none &kp LALT &mkp LCLK                 &mkp LCLK &kp LALT &kp F7 &kp F8 &kp F9 &kp F12
+&none &none &none &kp LG(LA(LEFT_ARROW)) &kp LG(LA(RIGHT_ARROW)) &mkp RCLK   &mkp RCLK &kp SLCK &kp F4 &kp F5 &kp F6 &kp F11
+&none &kp LG(LA(UP_ARROW)) &kp LG(LA(DOWN_ARROW)) &region_capture2 &none &none   &kp INSERT &kp PAUSE_BREAK &kp F1 &kp F2 &kp F3 &kp F10
+                                       &trans &trans &trans             &trans &trans &trans
             >;
         };
 
         function_layer {
             display-name = "Function";
 //   (ported from corne4-sys.vil layer 4: mission-control space switching + media transport + mac shortcuts)
-//   While this layer is held (left thumb, &lt 3 SPACE) the LEFT trackball scrolls; see &trackball_peripheral_listener at the end of this file.
+//   Hold with left thumb Space: the RIGHT trackball scrolls; see &trackball_central_listener below.
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │ ⌥⌘ SPC1 │ ⌥⌘ SPC2 │ ⌥⌘ SPC3 │ ⌥⌘ SPC4 │ ⌥⌘ SPC5 │                     │ ⌥⌘ SPC6 │ ⌥⌘ SPC7 │ ⌥⌘ SPC8 │ ⌥⌘ SPC9 │ ⌥⌘ SPC0 │  trans  │
 //   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
@@ -419,6 +446,7 @@
 
         numpad_layer {
             display-name = "Numpad";
+//   Hold with right thumb Escape: the LEFT trackball scrolls; see &trackball_peripheral_listener below.
 //   (ported from corne4-sys.vil layer 5)
 //   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
 //   │  trans  │  trans  │  trans  │  trans  │  trans  │  trans  │                     │  trans  │    7    │    8    │    9    │  trans  │  trans  │
@@ -455,26 +483,50 @@
                            &kp LALT  &kp SPACE  &kp SPACE       &trans  &trans  &trans
             >;
         };
+
+        maintenance_layer {
+            display-name = "Maintenance";
+// Enter from Base with 36+38 or 39+41, held for 500 ms. Release either to exit.
+// Commands are mirrored; Reset/Boot target the half of the command key.
+// Left:  BT0 BT1 BT2 BT3 BT4 —  | Right: — BT4 BT3 BT2 BT1 BT0
+//        Prev Next Output Studio — —    | — — Studio Output Next Prev
+//        Reset Boot Clear — — —        | — — — Clear Boot Reset
+// Unused keys, including thumbs, are blocked rather than transparent.
+            bindings = <
+&bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &none   &none &bt BT_SEL 4 &bt BT_SEL 3 &bt BT_SEL 2 &bt BT_SEL 1 &bt BT_SEL 0
+&bt BT_PRV &bt BT_NXT &out OUT_TOG &studio_unlock &none &none          &none &none &studio_unlock &out OUT_TOG &bt BT_NXT &bt BT_PRV
+&sys_reset &bootloader &bt BT_CLR &none &none &none                   &none &none &none &bt BT_CLR &bootloader &sys_reset
+                                       &none &none &none            &none &none &none
+            >;
+        };
     };
 };
 
-// ---- Left trackball: scroll while layer 3 (FUNCTION) is held ----
-// Events from the left (peripheral) ball arrive at the central (right half)
-// through trackball_peripheral_listener. The central knows the active layer,
-// so a per-layer child node here can change what happens to them. The ball
-// stays in its normal Cursor pipeline on every other layer.
-// X scrolls horizontally, Y vertically; diagonal movement does both.
-// Reverse vertical scrolling before mapping X/Y motion to wheel events.
-// Scale by 1/16: half the scroll output of the previous 1/8 setting.
-// Cursor movement and horizontal scroll direction retain their prior behavior.
+// ---- Left trackball: scroll while NUMPAD is held by the right thumb ----
+// Apply on the central, which knows the active layers, after split transport.
+// Reverse vertical scrolling and retain the 1/16 scaler and 16 ms rate limit.
 &trackball_peripheral_listener {
     scroll_layer {
-        layers = <3>;
+        layers = <NUMPAD>;
         input-processors
             = <&zip_xy_transform (INPUT_TRANSFORM_Y_INVERT)>
             , <&zip_xy_to_scroll_mapper>
             , <&zip_scroll_scaler 1 16>
-            , <&zip_report_rate_limit 16>
-            ;
+            , <&zip_report_rate_limit 16>;
+    };
+};
+
+// ---- Right trackball: scroll while FUNCTION is held by the left thumb ----
+// The right sensor's cursor orientation inverts X+Y. To reverse vertical
+// scroll relative to cursor motion, cancel that Y flip and retain the X flip.
+// This override replaces the normal cursor pipeline while FUNCTION is active.
+&trackball_central_listener {
+    scroll_layer {
+        layers = <FUNCTION>;
+        input-processors
+            = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>
+            , <&zip_xy_to_scroll_mapper>
+            , <&zip_scroll_scaler 1 16>
+            , <&zip_report_rate_limit 16>;
     };
 };
