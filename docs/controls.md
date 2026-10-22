@@ -48,13 +48,19 @@ cannot shorten the guard, but hold/tap processing may buffer them; wait for the
 guard to finish before pressing a command. Entry is available from Base only.
 
 ```text
-                   LEFT                                 RIGHT
- BT0    BT1    BT2    BT3    BT4    —  |   —     BT4    BT3    BT2    BT1    BT0
- PREV   NEXT   OUTPUT STUDIO  —     —  |   —      —    STUDIO OUTPUT NEXT   PREV
- RESET  BOOT   CLEAR   —      —     —  |   —      —      —    CLEAR  BOOT   RESET
+┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+│ BTSEL 0 │ BTSEL 1 │ BTSEL 2 │ BTSEL 3 │ BTSEL 4 │    —    │                     │    —    │ BTSEL 4 │ BTSEL 3 │ BTSEL 2 │ BTSEL 1 │ BTSEL 0 │
+├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+│ BT PREV │ BT NEXT │ OUT TOG │  STUDIO │    —    │    —    │                     │    —    │    —    │  STUDIO │ OUT TOG │ BT NEXT │ BT PREV │
+├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+│  RESET  │  BOOTLD │  BT CLR │    —    │    —    │    —    │                     │    —    │    —    │    —    │  BT CLR │  BOOTLD │  RESET  │
+└─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
+                                        │    —    │    —    │    —     ││    —    │    —    │    —    │
+                                        └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
 ```
 
-All six thumb positions and unused finger positions are disabled on this layer.
+In the diagram, `—` means disabled. All six thumb positions and unused finger
+positions are disabled on this layer.
 Bluetooth commands operate on the central keyboard's host profiles, whichever
 half provides the command key. CLEAR clears the selected profile's pairing.
 Reset and bootloader commands target the half where the command key is pressed.

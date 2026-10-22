@@ -488,9 +488,15 @@
             display-name = "Maintenance";
 // Enter from Base with 36+38 or 39+41, held for 500 ms. Release either to exit.
 // Commands are mirrored; Reset/Boot target the half of the command key.
-// Left:  BT0 BT1 BT2 BT3 BT4 —  | Right: — BT4 BT3 BT2 BT1 BT0
-//        Prev Next Output Studio — —    | — — Studio Output Next Prev
-//        Reset Boot Clear — — —        | — — — Clear Boot Reset
+//   ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐                     ┌─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+//   │ BTSEL 0 │ BTSEL 1 │ BTSEL 2 │ BTSEL 3 │ BTSEL 4 │    —    │                     │    —    │ BTSEL 4 │ BTSEL 3 │ BTSEL 2 │ BTSEL 1 │ BTSEL 0 │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │ BT PREV │ BT NEXT │ OUT TOG │  STUDIO │    —    │    —    │                     │    —    │    —    │  STUDIO │ OUT TOG │ BT NEXT │ BT PREV │
+//   ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                     ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+//   │  RESET  │  BOOTLD │  BT CLR │    —    │    —    │    —    │                     │    —    │    —    │    —    │  BT CLR │  BOOTLD │  RESET  │
+//   └─────────┴─────────┴─────────┴─────────┼─────────┼─────────┼──────────┬┬─────────┼─────────┼─────────┼─────────┴─────────┴─────────┴─────────┘
+//                                           │    —    │    —    │    —     ││    —    │    —    │    —    │
+//                                           └─────────┴─────────┴──────────┘└─────────┴─────────┴─────────┘
 // Unused keys, including thumbs, are blocked rather than transparent.
             bindings = <
 &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &none   &none &bt BT_SEL 4 &bt BT_SEL 3 &bt BT_SEL 2 &bt BT_SEL 1 &bt BT_SEL 0
