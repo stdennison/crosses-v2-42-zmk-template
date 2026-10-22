@@ -1,0 +1,31 @@
+description: Route input events through a selectable child pipeline
+compatible: "zmk,input-processor-pipeline-switch"
+include: base.yaml
+
+properties:
+  "#input-processor-cells":
+    type: int
+    required: true
+    const: 0
+  track-remainders:
+    type: boolean
+  persistent:
+    type: boolean
+  save-delay:
+    type: int
+    default: 2000
+    description: Delay in milliseconds before saving the active pipeline
+  default-index:
+    type: int
+    default: 0
+
+input-processor-cells: []
+
+child-binding:
+  description: An ordered pipeline of input processors
+  properties:
+    label:
+      type: string
+    input-processors:
+      type: phandle-array
+      required: true

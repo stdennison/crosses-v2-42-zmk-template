@@ -1,0 +1,8 @@
+description: Select a pipeline by index and optionally persist the selection
+compatible: "zmk,behavior-pipeline-switch"
+include: two_param.yaml
+
+properties:
+  processor:
+    type: phandle
+    required: true
