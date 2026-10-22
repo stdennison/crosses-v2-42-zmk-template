@@ -64,7 +64,7 @@ static const struct behavior_driver_api behavior_pipeline_switch_driver_api = {
     .binding_released = on_keymap_binding_released,
 };
 
-/* Inits at POST_KERNEL/96: after the pipeline-switch processor (95) this
+/* Inits at POST_KERNEL/81: after the pipeline-switch processor (80) this
  * behavior references via DEVICE_DT_GET. */
 #define PIPELINE_SWITCH_INST(n)                                                                    \
     static const struct behavior_pipeline_switch_config behavior_pipeline_switch_config_##n = {    \
@@ -72,7 +72,7 @@ static const struct behavior_driver_api behavior_pipeline_switch_driver_api = {
     };                                                                                             \
     BEHAVIOR_DT_INST_DEFINE(n, &behavior_pipeline_switch_init, NULL, NULL,                         \
                             &behavior_pipeline_switch_config_##n,                                  \
-                            POST_KERNEL, 20, &behavior_pipeline_switch_driver_api);
+                            POST_KERNEL, 81, &behavior_pipeline_switch_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(PIPELINE_SWITCH_INST)
 

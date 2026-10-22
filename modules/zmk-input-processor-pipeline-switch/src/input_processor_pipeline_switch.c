@@ -231,8 +231,8 @@ static const struct zmk_input_processor_driver_api zip_ps_driver_api = {
         .remainders = _CONCAT(zip_ps_rem_, DT_DEP_ORD(child)),                                \
     }
 
-/* Inits at POST_KERNEL/95: must be after the wrapped sub-processors, which
- * register at CONFIG_KERNEL_INIT_PRIORITY_DEFAULT. */
+/* Start after wrapped processors (CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, 40),
+ * and before input/split initialization (90). The select behavior starts at 81. */
 #define ZIP_PS_INST(n)                                                                             \
     BUILD_ASSERT(DT_INST_CHILD_NUM(n) > 0,                                                         \
                  "zmk,input-processor-pipeline-switch requires at least one child pipeline");      \
@@ -249,7 +249,7 @@ static const struct zmk_input_processor_driver_api zip_ps_driver_api = {
         .pipelines = zip_ps_pipelines_##n,                                                         \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, &zip_ps_init, NULL, &zip_ps_data_##n, &zip_ps_config_##n,             \
-                          POST_KERNEL, 20, &zip_ps_driver_api);
+                          POST_KERNEL, 80, &zip_ps_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ZIP_PS_INST)
 
